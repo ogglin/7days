@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html ng-app="sevendays">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no, width=device-width">
+  <link rel="stylesheet" type="text/css" href="css/style.css">
+  <link rel="stylesheet" href="css/ionic.min.css" />
+  <script src="https://code.jquery.com/jquery-2.1.3.min.js"></script>
+  <script src="js/ionic.bundle.min.js"></script>
+  <script src="js/ng-infinite-scroll.min.js"></script>
+  <script src="js/myapp.js"></script>
+</head>
+
+<body ng-controller="MainCtrl">
+
+    <ion-nav-view></ion-nav-view>
+
+    <script id="templates/event-menu.html" type="text/ng-template">
+      <ion-side-menus enable-menu-with-back-views="false">
+
+        <ion-side-menu-content>
+          <ion-nav-bar class="bar-positive">
+            <ion-nav-back-button>
+            </ion-nav-back-button>
+
+            <ion-nav-buttons side="left">
+              <button class="button button-icon button-clear ion-navicon" menu-toggle="left">
+              </button>
+            </ion-nav-buttons>
+          </ion-nav-bar>
+
+          <ion-nav-view name="menuContent"></ion-nav-view>
+        </ion-side-menu-content> 
+
+        <ion-side-menu side="left">
+          <ion-header-bar class="bar-assertive">
+            <h1 class="title">Left Menu</h1>
+          </ion-header-bar>
+          <ion-content>
+            <ul class="list">
+              <!-- Note each link has the 'menu-close' attribute so the menu auto closes when clicking on one of these links -->
+              <a href="#/event/check-in" class="item" menu-close>Check-in</a>
+              <a href="#/event/attendees" class="item" menu-close>Attendees</a>
+            </ul>
+          </ion-content>
+        </ion-side-menu>
+
+      </ion-side-menus>
+    </script>
+
+    <script id="templates/home.html" type="text/ng-template">
+      <ion-view view-title="Welcome">
+        <ion-content>
+           <ul class="result" >
+            <li class="news-item"   ng-repeat="new in news">
+            <div style="display:block;" ng-click="nextPage(new.id)" data-id="{{new.id}}">
+            <div class="row" style="padding:0px;">
+            <div class="col col-33" style="padding:0px;">
+                <div class="image" style="background-image:url('{{new.image}}');">
+                </div> 
+            </div>
+            <div class="col col-67" style="padding:0px;margin-left:10px;">
+                <div class="details"  style="height:80px;overflow:hidden;">
+                    <div class="title" style="color:#555555;font-weight:bold;">
+                       {{new.title}}
+                    </div>
+                    <div class="icons" style="color:#acacac;line-height:15px;">
+                        <div style="display:inline;font-size:10px;">
+                          <img src="img/icon_time.png" alt="" />  
+                          {{new.date}}
+                        </div>
+                        <div style="display:inline;font-size:10px;margin-left:10px;">
+                            <img src="img/icon_page.png" alt="" />
+                            {{new.category_name}}
+                        </div>
+                    </div>
+                    <div class="description" style="color:#555555;">
+                    <small> {{new.content}} ...</small>
+                    </div>
+                </div> 
+            </div>
+            </div>
+            </div>
+            </li>
+        </ul>
+
+        <ion-infinite-scroll on-infinite="loadMore()" ng-if="more"></ion-infinite-scroll>
+
+        </ion-content>
+      </ion-view>
+    </script>
+
+    <script id="templates/check-in.html" type="text/ng-template">
+      <ion-view view-title="Event Check-in">
+        <ion-content>
+          <form class="list" ng-show="showForm">
+            <div class="item item-divider">
+              Attendee Info
+            </div>
+            <label class="item item-input">
+              <input type="text" placeholder="First Name" ng-model="attendee.firstname">
+            </label>
+            <label class="item item-input">
+              <input type="text" placeholder="Last Name" ng-model="attendee.lastname">
+            </label>
+            <div class="item item-divider">
+              Shirt Size
+            </div>
+            <ion-radio ng-repeat="shirtSize in shirtSizes"
+                       ng-value="shirtSize.value"
+                       ng-model="attendee.shirtSize">
+              {{ shirtSize.text }}
+            </ion-radio>
+            <div class="item item-divider">
+              Lunch
+            </div>
+            <ion-toggle ng-model="attendee.vegetarian">
+              Vegetarian
+            </ion-toggle>
+            <div class="padding">
+              <button class="button button-block" ng-click="submit()">Checkin</button>
+            </div>
+          </form>
+
+          <div ng-hide="showForm">
+            <pre ng-bind="attendee | json"></pre> 
+            <a href="#/event/attendees">View attendees</a>
+          </div>
+        </ion-content>
+      </ion-view>
+    </script>
+
+    <script id="templates/attendees.html" type="text/ng-template">
+      <ion-view view-title="Event Attendees">
+        <ion-content>
+          <div class="list">
+            <ion-toggle ng-repeat="attendee in attendees | orderBy:'firstname' | orderBy:'lastname'"
+                        ng-model="attendee.arrived"
+                        ng-change="arrivedChange(attendee)">
+              {{ attendee.firstname }}
+              {{ attendee.lastname }}
+            </ion-toggle>
+            <div class="item item-divider">
+              Activity
+            </div>
+            <div class="item" ng-repeat="msg in activity">
+              {{ msg }}
+            </div>
+          </div>
+        </ion-content>
+      </ion-view>
+    </script>
+
+  </body>
+
+</html>
